@@ -3,102 +3,767 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Security Tool</title>
-    <link rel="stylesheet" href="styles.css">
-    <meta name="description" content="Generate memorable passwords, check password security, and improve existing passwords">
-    <meta name="keywords" content="password generator, security, password checker, cybersecurity">
+    <title>AskHub - Q&A Community</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            color: #f0f6fc;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(22, 27, 34, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #30363d;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            background: transparent;
+            color: #f0f6fc;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            border: none;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            border-color: #58a6ff;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .post-form {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .post-form.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #7d8590;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            background: rgba(13, 17, 23, 0.8);
+            color: #f0f6fc;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        .sort-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(22, 27, 34, 0.6);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+
+        .sort-options {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .sort-btn {
+            background: none;
+            border: none;
+            color: #7d8590;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .sort-btn:hover,
+        .sort-btn.active {
+            color: #58a6ff;
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .post {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .post:hover {
+            border-color: #58a6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .vote-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .vote-btn {
+            background: none;
+            border: none;
+            color: #7d8590;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+        }
+
+        .vote-btn:hover {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .vote-btn.upvoted {
+            color: #ff6b6b;
+        }
+
+        .vote-btn.downvoted {
+            color: #f85149;
+        }
+
+        .vote-count {
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .post-content {
+            flex: 1;
+        }
+
+        .post-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #f0f6fc;
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #7d8590;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .category-tag {
+            background: rgba(88, 166, 255, 0.2);
+            color: #58a6ff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .post-text {
+            color: #c9d1d9;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #7d8590;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .action-btn:hover {
+            color: #58a6ff;
+            background: rgba(88, 166, 255, 0.1);
+        }
+
+        .comments {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #30363d;
+            display: none;
+        }
+
+        .comments.visible {
+            display: block;
+        }
+
+        .comment {
+            background: rgba(13, 17, 23, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .comment-author {
+            font-weight: 500;
+            color: #58a6ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-text {
+            color: #c9d1d9;
+            line-height: 1.5;
+        }
+
+        .comment-form {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .comment-form.visible {
+            display: block;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            background: rgba(13, 17, 23, 0.8);
+            color: #f0f6fc;
+            margin-bottom: 0.75rem;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .sidebar-card {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f0f6fc;
+        }
+
+        .trending-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .trending-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-title {
+            font-size: 0.95rem;
+            color: #58a6ff;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .trending-meta {
+            font-size: 0.8rem;
+            color: #7d8590;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #58a6ff;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #7d8590;
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .nav-container {
+                padding: 0 1rem;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .nav-buttons {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🔐 Password Security Tool</h1>
-            <p>Create memorable passwords, check security, and improve existing ones</p>
-        </header>
-        
-        <!-- Password Creator Section -->
-        <section class="section creator">
-            <h2>🎯 Password Creator</h2>
-            <p>Create memorable passwords based on personal information</p>
-            
-            <div class="form-group">
-                <label for="petName">Favorite Pet/Animal Name:</label>
-                <input type="text" id="petName" placeholder="e.g., Fluffy, Tiger">
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">🚀 AskHub</div>
+            <div class="nav-buttons">
+                <button class="btn" onclick="toggleSort()">Sort</button>
+                <button class="btn btn-primary" onclick="togglePostForm()">Ask Question</button>
             </div>
-            
-            <div class="form-group">
-                <label for="birthYear">Birth Year:</label>
-                <input type="number" id="birthYear" placeholder="e.g., 1995" min="1900" max="2024">
-            </div>
-            
-            <div class="form-group">
-                <label for="favColor">Favorite Color:</label>
-                <input type="text" id="favColor" placeholder="e.g., Blue, Red">
-            </div>
-            
-            <div class="form-group">
-                <label for="luckyNumber">Lucky Number:</label>
-                <input type="number" id="luckyNumber" placeholder="e.g., 7, 42" min="1" max="999">
-            </div>
-            
-            <div class="form-group">
-                <label for="passwordStyle">Password Style:</label>
-                <select id="passwordStyle">
-                    <option value="camelCase">CamelCase (FluffyBlue1995)</option>
-                    <option value="underscore">Underscore (fluffy_blue_1995)</option>
-                    <option value="symbols">With Symbols (Fluffy@Blue#1995)</option>
-                    <option value="leetspeak">Leet Speak (F1uff7_Blu3_1995!)</option>
-                </select>
-            </div>
-            
-            <div class="button-group">
-                <button onclick="generatePassword()">Generate Password</button>
-                <button onclick="generateMultiple()">Generate 3 Variations</button>
-            </div>
-            
-            <div id="generatedPasswords"></div>
-        </section>
-        
-        <!-- Password Checker Section -->
-        <section class="section checker">
-            <h2>🔍 Password Checker</h2>
-            <p>Check if your password is secure and not commonly used</p>
-            
-            <div class="form-group">
-                <label for="passwordToCheck">Enter Password to Check:</label>
-                <div class="password-input-group">
-                    <input type="password" id="passwordToCheck" placeholder="Enter your password">
-                    <button type="button" class="toggle-btn" onclick="togglePasswordVisibility('passwordToCheck')">👁️</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <main class="content">
+            <div class="post-form" id="postForm">
+                <h2 style="margin-bottom: 1.5rem; color: #f0f6fc;">Ask a Question</h2>
+                <div class="form-group">
+                    <label for="title">Question Title</label>
+                    <input type="text" id="title" placeholder="What's your question?">
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category">
+                        <option value="general">General</option>
+                        <option value="tech">Technology</option>
+                        <option value="science">Science</option>
+                        <option value="programming">Programming</option>
+                        <option value="design">Design</option>
+                        <option value="business">Business</option>
+                        <option value="lifestyle">Lifestyle</option>
+                        <option value="education">Education</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Provide more details about your question..."></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="submitPost()">Post Question</button>
+                    <button class="btn" onclick="togglePostForm()">Cancel</button>
                 </div>
             </div>
-            
-            <button onclick="checkPassword()">Check Password Security</button>
-            
-            <div id="passwordAnalysis"></div>
-        </section>
-        
-        <!-- Password Editor Section -->
-        <section class="section editor">
-            <h2>✏️ Password Editor</h2>
-            <p>Improve your password based on security recommendations</p>
-            
-            <div class="form-group">
-                <label for="currentPassword">Current Password:</label>
-                <div class="password-input-group">
-                    <input type="password" id="currentPassword" placeholder="Enter password to improve">
-                    <button type="button" class="toggle-btn" onclick="togglePasswordVisibility('currentPassword')">👁️</button>
+
+            <div class="sort-bar">
+                <div class="sort-options">
+                    <button class="sort-btn active" onclick="sortBy('hot')">🔥 Hot</button>
+                    <button class="sort-btn" onclick="sortBy('new')">🆕 New</button>
+                    <button class="sort-btn" onclick="sortBy('top')">⭐ Top</button>
+                </div>
+                <div style="color: #7d8590; font-size: 0.9rem;" id="postCount">0 questions</div>
+            </div>
+
+            <div id="posts-container">
+                <!-- Posts will be dynamically generated here -->
+            </div>
+        </main>
+
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">📊 Community Stats</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalPosts">0</div>
+                        <div class="stat-label">Questions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalComments">0</div>
+                        <div class="stat-label">Answers</div>
+                    </div>
                 </div>
             </div>
-            
-            <button onclick="analyzeAndEdit()">Analyze & Get Suggestions</button>
-            
-            <div id="editingSuggestions"></div>
-        </section>
+
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">🔥 Trending Topics</h3>
+                <div id="trending-container">
+                    <div class="trending-item">
+                        <a href="#" class="trending-title">How to learn programming?</a>
+                        <div class="trending-meta">15 answers • Tech</div>
+                    </div>
+                    <div class="trending-item">
+                        <a href="#" class="trending-title">Best project management tools</a>
+                        <div class="trending-meta">8 answers • Business</div>
+                    </div>
+                    <div class="trending-item">
+                        <a href="#" class="trending-title">Healthy morning routines</a>
+                        <div class="trending-meta">12 answers • Lifestyle</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">📚 Categories</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <span class="category-tag">Technology</span>
+                    <span class="category-tag">Programming</span>
+                    <span class="category-tag">Science</span>
+                    <span class="category-tag">Design</span>
+                    <span class="category-tag">Business</span>
+                    <span class="category-tag">Lifestyle</span>
+                </div>
+            </div>
+        </aside>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Password Security Tool | Built for better cybersecurity</p>
-    </footer>
+    <script>
+        let posts = [];
+        let currentSort = 'hot';
 
-    <script src="script.js"></script>
+        // Sample initial data
+        const samplePosts = [
+            {
+                id: 1,
+                title: "How do I center a div in CSS?",
+                description: "I've been struggling with centering a div both horizontally and vertically. What are the best modern approaches?",
+                category: "programming",
+                author: "WebDev_Newbie",
+                votes: 15,
+                comments: [
+                    { author: "CSS_Master", text: "Use flexbox: display: flex; justify-content: center; align-items: center;" },
+                    { author: "GridExpert", text: "CSS Grid is also great: display: grid; place-items: center;" }
+                ],
+                timestamp: new Date(Date.now() - 3600000)
+            },
+            {
+                id: 2,
+                title: "What's the best way to learn machine learning?",
+                description: "I'm a beginner in ML and looking for structured learning paths. Any recommendations for courses or books?",
+                category: "tech",
+                author: "AI_Curious",
+                votes: 23,
+                comments: [
+                    { author: "ML_Veteran", text: "Start with Andrew Ng's course on Coursera. Great foundation!" },
+                    { author: "DataScientist", text: "Python is essential. Learn pandas, numpy, and scikit-learn." }
+                ],
+                timestamp: new Date(Date.now() - 7200000)
+            },
+            {
+                id: 3,
+                title: "How to maintain work-life balance while remote working?",
+                description: "Working from home has blurred the lines between work and personal time. Looking for practical tips.",
+                category: "lifestyle",
+                author: "RemoteWorker",
+                votes: 8,
+                comments: [
+                    { author: "WorkLifePro", text: "Set specific work hours and stick to them. Create a dedicated workspace." }
+                ],
+                timestamp: new Date(Date.now() - 1800000)
+            }
+        ];
+
+        // Initialize with sample data
+        posts = [...samplePosts];
+
+        function togglePostForm() {
+            const form = document.getElementById('postForm');
+            form.classList.toggle('active');
+        }
+
+        function toggleSort() {
+            // Could implement a dropdown menu for sorting options
+            console.log('Sort toggle clicked');
+        }
+
+        function submitPost() {
+            const title = document.getElementById('title').value;
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value;
+
+            if (!title || !description) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const newPost = {
+                id: Date.now(),
+                title,
+                description,
+                category,
+                author: 'Anonymous',
+                votes: 0,
+                comments: [],
+                timestamp: new Date()
+            };
+
+            posts.unshift(newPost);
+            
+            // Clear form
+            document.getElementById('title').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('category').value = 'general';
+            
+            togglePostForm();
+            renderPosts();
+            updateStats();
+        }
+
+        function vote(postId, direction) {
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                post.votes += direction;
+                renderPosts();
+            }
+        }
+
+        function toggleComments(postId) {
+            const comments = document.getElementById(`comments-${postId}`);
+            const commentForm = document.getElementById(`comment-form-${postId}`);
+            
+            if (comments) {
+                comments.classList.toggle('visible');
+                if (commentForm) {
+                    commentForm.classList.toggle('visible');
+                }
+            }
+        }
+
+        function addComment(postId) {
+            const commentInput = document.getElementById(`comment-input-${postId}`);
+            const commentText = commentInput.value.trim();
+            
+            if (!commentText) return;
+
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                post.comments.push({
+                    author: 'Anonymous',
+                    text: commentText
+                });
+                
+                commentInput.value = '';
+                renderPosts();
+                updateStats();
+            }
+        }
+
+        function sortBy(type) {
+            currentSort = type;
+            
+            // Update active sort button
+            document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            switch(type) {
+                case 'hot':
+                    posts.sort((a, b) => (b.votes + b.comments.length) - (a.votes + a.comments.length));
+                    break;
+                case 'new':
+                    posts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    break;
+                case 'top':
+                    posts.sort((a, b) => b.votes - a.votes);
+                    break;
+            }
+            
+            renderPosts();
+        }
+
+        function renderPosts() {
+            const container = document.getElementById('posts-container');
+            
+            if (posts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: #7d8590;">
+                        <h3>No questions yet!</h3>
+                        <p>Be the first to ask a question to get the community started.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = posts.map(post => `
+                <div class="post">
+                    <div class="post-header">
+                        <div class="vote-buttons">
+                            <button class="vote-btn" onclick="vote(${post.id}, 1)">▲</button>
+                            <div class="vote-count">${post.votes}</div>
+                            <button class="vote-btn" onclick="vote(${post.id}, -1)">▼</button>
+                        </div>
+                        <div class="post-content">
+                            <h3 class="post-title">${post.title}</h3>
+                            <div class="post-meta">
+                                <span class="category-tag">${post.category}</span>
+                                <span>by ${post.author}</span>
+                                <span>${formatTime(post.timestamp)}</span>
+                            </div>
+                            <p class="post-text">${post.description}</p>
+                            <div class="post-actions">
+                                <button class="action-btn" onclick="toggleComments(${post.id})">
+                                    💬 ${post.comments.length} answers
+                                </button>
+                                <button class="action-btn">🔗 Share</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="comments" id="comments-${post.id}">
+                        ${post.comments.map(comment => `
+                            <div class="comment">
+                                <div class="comment-author">${comment.author}</div>
+                                <div class="comment-text">${comment.text}</div>
+                            </div>
+                        `).join('')}
+                        
+                        <div class="comment-form" id="comment-form-${post.id}">
+                            <textarea class="comment-input" id="comment-input-${post.id}" placeholder="Write your answer..."></textarea>
+                            <button class="btn btn-primary" onclick="addComment(${post.id})">Post Answer</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatTime(timestamp) {
+            const now = new Date();
+            const diff = now - new Date(timestamp);
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (days > 0) return `${days}d ago`;
+            if (hours > 0) return `${hours}h ago`;
+            if (minutes > 0) return `${minutes}m ago`;
+            return 'just now';
+        }
+
+        function updateStats() {
+            const totalComments = posts.reduce((sum, post) => sum + post.comments.length, 0);
+            
+            document.getElementById('totalPosts').textContent = posts.length;
+            document.getElementById('totalComments').textContent = totalComments;
+            document.getElementById('postCount').textContent = `${posts.length} questions`;
+        }
+
+        // Initialize the page
+        renderPosts();
+        updateStats();
+    </script>
 </body>
 </html>
