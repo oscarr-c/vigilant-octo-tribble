@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Security Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Generate memorable passwords, check password security, and improve existing passwords">
+    <meta name="keywords" content="password generator, security, password checker, cybersecurity">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Password Security Tool</h1>
+            <p>Create memorable passwords, check security, and improve existing ones</p>
+        </header>
+        
+        <!-- Password Creator Section -->
+        <section class="section creator">
+            <h2>🎯 Password Creator</h2>
+            <p>Create memorable passwords based on personal information</p>
+            
+            <div class="form-group">
+                <label for="petName">Favorite Pet/Animal Name:</label>
+                <input type="text" id="petName" placeholder="e.g., Fluffy, Tiger">
+            </div>
+            
+            <div class="form-group">
+                <label for="birthYear">Birth Year:</label>
+                <input type="number" id="birthYear" placeholder="e.g., 1995" min="1900" max="2024">
+            </div>
+            
+            <div class="form-group">
+                <label for="favColor">Favorite Color:</label>
+                <input type="text" id="favColor" placeholder="e.g., Blue, Red">
+            </div>
+            
+            <div class="form-group">
+                <label for="luckyNumber">Lucky Number:</label>
+                <input type="number" id="luckyNumber" placeholder="e.g., 7, 42" min="1" max="999">
+            </div>
+            
+            <div class="form-group">
+                <label for="passwordStyle">Password Style:</label>
+                <select id="passwordStyle">
+                    <option value="camelCase">CamelCase (FluffyBlue1995)</option>
+                    <option value="underscore">Underscore (fluffy_blue_1995)</option>
+                    <option value="symbols">With Symbols (Fluffy@Blue#1995)</option>
+                    <option value="leetspeak">Leet Speak (F1uff7_Blu3_1995!)</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button onclick="generatePassword()">Generate Password</button>
+                <button onclick="generateMultiple()">Generate 3 Variations</button>
+            </div>
+            
+            <div id="generatedPasswords"></div>
+        </section>
+        
+        <!-- Password Checker Section -->
+        <section class="section checker">
+            <h2>🔍 Password Checker</h2>
+            <p>Check if your password is secure and not commonly used</p>
+            
+            <div class="form-group">
+                <label for="passwordToCheck">Enter Password to Check:</label>
+                <div class="password-input-group">
+                    <input type="password" id="passwordToCheck" placeholder="Enter your password">
+                    <button type="button" class="toggle-btn" onclick="togglePasswordVisibility('passwordToCheck')">👁️</button>
+                </div>
+            </div>
+            
+            <button onclick="checkPassword()">Check Password Security</button>
+            
+            <div id="passwordAnalysis"></div>
+        </section>
+        
+        <!-- Password Editor Section -->
+        <section class="section editor">
+            <h2>✏️ Password Editor</h2>
+            <p>Improve your password based on security recommendations</p>
+            
+            <div class="form-group">
+                <label for="currentPassword">Current Password:</label>
+                <div class="password-input-group">
+                    <input type="password" id="currentPassword" placeholder="Enter password to improve">
+                    <button type="button" class="toggle-btn" onclick="togglePasswordVisibility('currentPassword')">👁️</button>
+                </div>
+            </div>
+            
+            <button onclick="analyzeAndEdit()">Analyze & Get Suggestions</button>
+            
+            <div id="editingSuggestions"></div>
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Password Security Tool | Built for better cybersecurity</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
