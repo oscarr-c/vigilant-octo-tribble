@@ -624,27 +624,32 @@
             }
         }
 
-        function sharePost(postId) {
+        function sharePost(postId, buttonElement) {
             const post = posts.find(p => p.id === postId);
             if (post) {
                 const baseUrl = window.location.origin + window.location.pathname;
                 const shareUrl = `${baseUrl}?post=${postId}`;
                 
                 // Copy to clipboard
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                    // Show temporary notification
-                    const originalText = event.target.textContent;
-                    event.target.textContent = '✅ Link copied!';
-                    event.target.style.color = '#2ea043';
-                    
-                    setTimeout(() => {
-                        event.target.textContent = originalText;
-                        event.target.style.color = '';
-                    }, 2000);
-                }).catch(() => {
-                    // Fallback for browsers that don't support clipboard API
-                    alert(`Share this link: ${shareUrl}`);
-                });
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        // Show temporary notification
+                        const originalText = buttonElement.textContent;
+                        buttonElement.textContent = '✅ Link copied!';
+                        buttonElement.style.color = '#2ea043';
+                        
+                        setTimeout(() => {
+                            buttonElement.textContent = originalText;
+                            buttonElement.style.color = '';
+                        }, 2000);
+                    }).catch(() => {
+                        // Fallback for browsers that don't support clipboard API
+                        prompt('Copy this link:', shareUrl);
+                    });
+                } else {
+                    // Fallback for browsers without clipboard API
+                    prompt('Copy this link:', shareUrl);
+                }
             }
         }
 
