@@ -536,50 +536,40 @@
         let posts = [];
         let currentSort = 'hot';
 
-        // Sample initial data
-        const samplePosts = [
-            {
-                id: 1,
-                title: "How do I center a div in CSS?",
-                description: "I've been struggling with centering a div both horizontally and vertically. What are the best modern approaches?",
-                category: "programming",
-                author: "WebDev_Newbie",
-                votes: 15,
-                comments: [
-                    { author: "CSS_Master", text: "Use flexbox: display: flex; justify-content: center; align-items: center;" },
-                    { author: "GridExpert", text: "CSS Grid is also great: display: grid; place-items: center;" }
-                ],
-                timestamp: new Date(Date.now() - 3600000)
-            },
-            {
-                id: 2,
-                title: "What's the best way to learn machine learning?",
-                description: "I'm a beginner in ML and looking for structured learning paths. Any recommendations for courses or books?",
-                category: "tech",
-                author: "AI_Curious",
-                votes: 23,
-                comments: [
-                    { author: "ML_Veteran", text: "Start with Andrew Ng's course on Coursera. Great foundation!" },
-                    { author: "DataScientist", text: "Python is essential. Learn pandas, numpy, and scikit-learn." }
-                ],
-                timestamp: new Date(Date.now() - 7200000)
-            },
-            {
-                id: 3,
-                title: "How to maintain work-life balance while remote working?",
-                description: "Working from home has blurred the lines between work and personal time. Looking for practical tips.",
-                category: "lifestyle",
-                author: "RemoteWorker",
-                votes: 8,
-                comments: [
-                    { author: "WorkLifePro", text: "Set specific work hours and stick to them. Create a dedicated workspace." }
-                ],
-                timestamp: new Date(Date.now() - 1800000)
+        // Load data from local storage
+        function loadData() {
+            try {
+                const savedPosts = window.localStorage.getItem('askHubPosts');
+                if (savedPosts) {
+                    const parsed = JSON.parse(savedPosts);
+                    // Convert timestamp strings back to Date objects
+                    posts = parsed.map(post => ({
+                        ...post,
+                        timestamp: new Date(post.timestamp),
+                        comments: post.comments.map(comment => ({
+                            ...comment,
+                            timestamp: comment.timestamp ? new Date(comment.timestamp) : new Date()
+                        }))
+                    }));
+                }
+            } catch (error) {
+                console.log('Could not load saved data:', error);
+                posts = [];
             }
-        ];
+        }
 
-        // Initialize with sample data
-        posts = [...samplePosts];
+        // Save data to local storage
+        function saveData() {
+            try {
+                window.localStorage.setItem('askHubPosts', JSON.stringify(posts));
+                console.log('Data saved successfully');
+            } catch (error) {
+                console.log('Could not save data:', error);
+            }
+        }
+
+        // Initialize with saved data or empty array
+        loadData();
 
         function togglePostForm() {
             const form = document.getElementById('postForm');
@@ -613,6 +603,7 @@
             };
 
             posts.unshift(newPost);
+            saveData(); // Save to localStorage
             
             // Clear form
             document.getElementById('title').value = '';
@@ -628,7 +619,59 @@
             const post = posts.find(p => p.id === postId);
             if (post) {
                 post.votes += direction;
+                saveData(); // Save to localStorage
                 renderPosts();
+            }
+        }
+
+        function sharePost(postId) {
+            const post = posts.find(p => p.id === postId);
+            if (post) {
+                const baseUrl = window.location.origin + window.location.pathname;
+                const shareUrl = `${baseUrl}?post=${postId}`;
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    // Show temporary notification
+                    const originalText = event.target.textContent;
+                    event.target.textContent = '✅ Link copied!';
+                    event.target.style.color = '#2ea043';
+                    
+                    setTimeout(() => {
+                        event.target.textContent = originalText;
+                        event.target.style.color = '';
+                    }, 2000);
+                }).catch(() => {
+                    // Fallback for browsers that don't support clipboard API
+                    alert(`Share this link: ${shareUrl}`);
+                });
+            }
+        }
+
+        // Check for shared post in URL
+        function checkForSharedPost() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('post');
+            
+            if (postId) {
+                const post = posts.find(p => p.id === parseInt(postId));
+                if (post) {
+                    // Scroll to the post and highlight it
+                    setTimeout(() => {
+                        const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+                        if (postElement) {
+                            postElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            postElement.style.border = '2px solid #58a6ff';
+                            postElement.style.boxShadow = '0 0 20px rgba(88, 166, 255, 0.3)';
+                            
+                            // Remove highlight after 3 seconds
+                            setTimeout(() => {
+                                postElement.style.border = '1px solid #30363d';
+                                postElement.style.boxShadow = '';
+                            }, 3000);
+                        }
+                    }, 100);
+                }
             }
         }
 
@@ -643,8 +686,6 @@
                 }
             }
         }
-
-        function addComment(postId) {
             const commentInput = document.getElementById(`comment-input-${postId}`);
             const commentText = commentInput.value.trim();
             
@@ -654,16 +695,18 @@
             if (post) {
                 post.comments.push({
                     author: 'Anonymous',
-                    text: commentText
+                    text: commentText,
+                    timestamp: new Date()
                 });
                 
                 commentInput.value = '';
+                saveData(); // Save to localStorage
                 renderPosts();
                 updateStats();
             }
         }
 
-        function sortBy(type) {
+        function addComment(postId) {
             currentSort = type;
             
             // Update active sort button
@@ -699,7 +742,7 @@
             }
 
             container.innerHTML = posts.map(post => `
-                <div class="post">
+                <div class="post" data-post-id="${post.id}">
                     <div class="post-header">
                         <div class="vote-buttons">
                             <button class="vote-btn" onclick="vote(${post.id}, 1)">▲</button>
@@ -718,7 +761,7 @@
                                 <button class="action-btn" onclick="toggleComments(${post.id})">
                                     💬 ${post.comments.length} answers
                                 </button>
-                                <button class="action-btn">🔗 Share</button>
+                                <button class="action-btn" onclick="sharePost(${post.id})">🔗 Share</button>
                             </div>
                         </div>
                     </div>
@@ -728,6 +771,9 @@
                             <div class="comment">
                                 <div class="comment-author">${comment.author}</div>
                                 <div class="comment-text">${comment.text}</div>
+                                <div style="font-size: 0.8rem; color: #7d8590; margin-top: 0.5rem;">
+                                    ${comment.timestamp ? formatTime(comment.timestamp) : 'some time ago'}
+                                </div>
                             </div>
                         `).join('')}
                         
@@ -764,6 +810,7 @@
         // Initialize the page
         renderPosts();
         updateStats();
+        checkForSharedPost();
     </script>
 </body>
 </html>
